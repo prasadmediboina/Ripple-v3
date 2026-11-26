@@ -1,0 +1,24 @@
+export type Step = { source_id: string; target_id: string; relation: string; evidence: string; resolution: string };
+export type Change = { node_id: string; kind: "added" | "modified" | "removed"; node_type: string; file_path: string; name: string };
+export type Finding = { changed_node_id: string; affected_node_id: string; affected_name: string; affected_file: string;
+  depth: number; path: Step[]; confidence: "high" | "medium" | "low"; reason: string; is_test: boolean; status: string };
+export type TestRec = { test_node_id: string; test_name: string; file_path: string; reason: string; covers: string[] };
+export type Report = { summary: { changed_elements: number; potentially_affected: number; recommended_tests: number; coverage_gaps: number };
+  changes: Change[]; findings: Finding[]; explanations: Record<string, string>; tests: TestRec[]; coverage_gaps: string[];
+  unknowns: string[]; not_analyzed: string[]; limitations: string[]; risk?: Risk; reviewers?: Reviewer[] };
+export type AnalysisRow = { id: string; status: string; created_at: string; pr_number: number; title: string; repository: string;
+  summary: Report["summary"] | null };
+export type Repo = { id: string; name: string; full_name: string | null; last_indexed_sha: string | null; source: string };
+export type DashboardData = { repositories: number; analyses_completed: number; changed_elements: number; potentially_affected: number;
+  coverage_gaps: number; feedback: Record<string, number>; measured_precision: number | null; timeline?: Day[] };
+export type Usage = { plan: string; period: string; analyses: number; limits: { repositories: number | null; analyses_per_month: number | null } };
+
+export type Risk = { score: number; level: "low" | "moderate" | "elevated" | "high"; factors: { label: string; points: number; detail: string }[]; note: string };
+export type Reviewer = { author: string; files_covered: number; commits: number; files: string[] };
+export type Day = { date: string; count: number };
+export type AdminOverview = { users: number; organizations: number; repositories: number; analyses_total: number; plans: Record<string, number>;
+  paying_teams: number; comped_teams: number; list_price_mrr_inr: number; mrr_inr: number; mrr_note: string; milestones: { target: number; reached: boolean }[]; signups: Day[]; analyses_daily: Day[];
+  feedback: Record<string, number>; measured_precision: number | null; leads: Record<string, number> };
+export type OrgRow = { id: string; name: string; plan: string; members: number; repositories: number; analyses_this_month: number };
+export type LeadRow = { id: string; name: string; company: string; contact: string; stage: string; note: string };
+export type AuditRow = { id: number; organization_id: string; action: string; detail: string; created_at: string };

@@ -1,0 +1,17 @@
+# Copy to .github/workflows/ripple.yml in YOUR repository.
+# Runs Ripple inside your own CI: source code never leaves GitHub's runner.
+name: Ripple impact report
+on: [pull_request]
+permissions: { contents: read, pull-requests: write }
+jobs:
+  ripple:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install git+https://github.com/<YOUR_ORG>/ripple.git#subdirectory=backend   # or vendor backend/app
+      - run: python -m app.cli analyze --base origin/${{ github.base_ref }} --head HEAD --output ripple.md
+      - env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file ripple.md

@@ -1,0 +1,11 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+:root { color-scheme: dark; }
+body { @apply bg-ink text-fog font-sans antialiased; }
+a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid #4DA3FF; outline-offset: 2px; }
+.card { @apply bg-panel border border-line rounded-lg; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors; }
+.btn-primary { @apply bg-ripple text-ink hover:bg-white; }
+.btn-ghost { @apply border border-line text-fog hover:bg-raised; }
+.ring-pulse { transform-origin: center; animation: pulse 3.2s ease-out infinite; }
+@keyframes pulse { 0% { opacity: .55; transform: scale(.6);} 100% { opacity: 0; transform: scale(1.5);} }
+@media (prefers-reduced-motion: reduce) { .ring-pulse { animation: none; opacity: .15; } }

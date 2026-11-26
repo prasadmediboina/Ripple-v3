@@ -1,0 +1,67 @@
+# Render Blueprint: Dashboard -> New -> Blueprint -> pick this repository.
+# Variables marked sync:false are asked for during setup (leave blank any you don't have yet).
+databases:
+  - name: ripple-db
+    plan: free
+    databaseName: ripple
+    user: ripple
+
+services:
+  - type: web
+    name: ripple-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: RIPPLE_ENV
+        value: production
+      - key: QUEUE_BACKEND
+        value: inline
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ripple-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: FRONTEND_URL          # the ripple-web address, e.g. https://ripple-web.onrender.com
+        sync: false
+      - key: ADMIN_EMAILS          # your login email(s), comma-separated
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: RAZORPAY_PLAN_PRO
+        sync: false
+      - key: RAZORPAY_PLAN_TEAM
+        sync: false
+      - key: GITHUB_APP_SLUG
+        sync: false
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_WEBHOOK_SECRET
+        sync: false
+
+  - type: web
+    name: ripple-web
+    runtime: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: BACKEND_URL           # the ripple-api address, e.g. https://ripple-api.onrender.com
+        sync: false

@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: ripple, POSTGRES_PASSWORD: ripple, POSTGRES_DB: ripple }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U ripple"], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7-alpine
+  api:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://ripple:ripple@db:5432/ripple
+      REDIS_URL: redis://redis:6379/0
+      QUEUE_BACKEND: celery
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+    ports: ["8000:8000"]
+  worker:
+    build: ./backend
+    command: celery -A app.worker.celery_app worker -l info --concurrency 2
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://ripple:ripple@db:5432/ripple
+      REDIS_URL: redis://redis:6379/0
+    depends_on: [api]
+  web:
+    build: ./frontend
+    environment: { BACKEND_URL: "http://api:8000" }
+    ports: ["3000:3000"]
+    depends_on: [api]
+volumes: { pgdata: {} }
